@@ -2,6 +2,22 @@
 
 Ce projet est une application médicale construite avec FastAPI.
 
+## Démarrage rapide (Docker Compose)
+
+Si Docker Desktop est installé et démarré, lance directement:
+
+```bash
+docker compose up --build
+```
+
+Accès: http://127.0.0.1:8000 et http://127.0.0.1:8000/docs
+
+Pour arrêter:
+
+```bash
+docker compose down
+```
+
 ## Prérequis
 
 - Python 3.12 ou supérieur

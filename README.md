@@ -4,7 +4,7 @@ Ce projet est une application médicale construite avec FastAPI.
 
 ## Prérequis
 
-- Python 3.14 ou supérieur
+- Python 3.12 ou supérieur
 - Un environnement virtuel Python (venv)
 
 ## Installation
@@ -12,7 +12,7 @@ Ce projet est une application médicale construite avec FastAPI.
 1. Cloner le repository :
 ```bash
 git clone https://github.com/NO-YA/MedBridge.git
-cd fastapi-todo
+cd MedBridge
 ```
 
 2. Créer un environnement virtuel :
@@ -39,7 +39,7 @@ source .venv/bin/activate
 
 4. Installer les dépendances :
 ```bash
-pip install fastapi uvicorn
+pip install -r requirements.txt
 ```
 
 ## Lancement de l'application
@@ -56,6 +56,24 @@ L'application sera accessible aux adresses suivantes :
 - Documentation Swagger : http://127.0.0.1:8000/docs
 - Documentation ReDoc : http://127.0.0.1:8000/redoc
 
+## Exécution avec Docker
+
+- Build de l'image
+```bash
+docker build -t medbridge-api .
+```
+
+- Lancer le conteneur
+```bash
+docker run -it --rm -p 8000:8000 medbridge-api
+```
+
+- Avec Docker Compose
+```bash
+docker compose up --build
+docker compose down
+```
+
 ## Développement
 
 Le mode `--reload` est activé par défaut, ce qui signifie que le serveur se rechargera automatiquement à chaque modification du code.
@@ -67,10 +85,11 @@ Pour arrêter le serveur, appuyez sur `Ctrl+C` dans le terminal.
 ## Structure du projet
 
 ```
-fastapi-todo/
-├── .venv/              # Environnement virtuel Python
-├── main.py            # Point d'entrée de l'application
-└── README.md         # Ce fichier
-```
-
-C:/Users/N.O.Y.A/Documents/fastapi-todo/.venv/Scripts/Activate.ps1; uvicorn main:app --reload
+MedBridge/
+├── main.py               # Point d'entrée de l'application
+├── requirements.txt      # Dépendances Python
+├── Dockerfile            # Image Docker pour exécuter l'app
+├── docker-compose.yml    # Lancement simplifié avec Docker Compose
+├── .dockerignore         # Fichiers ignorés par Docker
+├── .venv/                # (Optionnel) Environnement virtuel local
+└── README.md             # Ce fichier

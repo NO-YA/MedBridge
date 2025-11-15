@@ -1,0 +1,10 @@
+services:
+  app:
+    build: .
+    image: medbridge-api:latest
+    ports:
+      - "8000:8000"
+    # Command omitted to use image default (CMD in Dockerfile)
+    # command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# Compose V2 format (no version key needed)

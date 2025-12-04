@@ -10,7 +10,8 @@ RUN adduser --disabled-password --gecos '' appuser
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# Copy application files and make them owned by non-root user
+COPY --chown=appuser:appuser . .
 
 EXPOSE 8000
 

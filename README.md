@@ -15,81 +15,130 @@ git clone https://github.com/NO-YA/MedBridge.git
 cd MedBridge
 ```
 
-2. Créer un environnement virtuel :
+# MedBridge — API To-Do médicale (FastAPI)
+
+Petite API de gestion de tâches médicales construite avec FastAPI. Le projet utilise SQLite localement pour la persistance (via `sqlmodel`).
+
+**Principales fonctionnalités**
+- CRUD complet pour les tâches (`/todos/`)
+- Documentation interactive : `/docs` (Swagger) et `/redoc`
+
+## Prérequis
+
+- Python 3.11+ (3.12 recommandé)
+- Docker (optionnel pour exécution en conteneur)
+
+## Installation et exécution (local)
+
+1. Cloner le repository:
+
 ```bash
-python -m venv .venv
+git clone https://github.com/NO-YA/MedBridge.git
+cd MedBridge
 ```
 
-3. Activer l'environnement virtuel :
+2. Créer et activer un environnement virtuel:
 
-- Sous Windows (PowerShell) :
+Windows (PowerShell):
 ```powershell
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-- Sous Windows (CMD) :
-```cmd
-.\.venv\Scripts\activate.bat
-```
-
-- Sous Linux/MacOS :
+Linux / macOS:
 ```bash
+python -m venv .venv
 source .venv/bin/activate
 ```
 
-4. Installer les dépendances :
+3. Installer les dépendances (versions pinées dans `requirements.txt`):
+
 ```bash
 pip install -r requirements.txt
 ```
 
-## Lancement de l'application
+4. Lancer l'application en mode développement:
 
-1. Activer l'environnement virtuel (voir étape 3 ci-dessus)
-
-2. Lancer le serveur :
 ```bash
 uvicorn main:app --reload
 ```
 
-L'application sera accessible aux adresses suivantes :
-- Interface principale : http://127.0.0.1:8000
-- Documentation Swagger : http://127.0.0.1:8000/docs
-- Documentation ReDoc : http://127.0.0.1:8000/redoc
+Accéder ensuite à:
+- API root : `http://127.0.0.1:8000/`
+- Swagger UI : `http://127.0.0.1:8000/docs`
+- ReDoc : `http://127.0.0.1:8000/redoc`
+
+## Configuration (variables d'environnement)
+
+- `DATABASE_URL` : URL de la base de données SQLAlchemy. Par défaut: `sqlite:///./medbridge.db`.
+	- Exemple pour un volume Docker : `sqlite:////data/medbridge.db` (notez les 4 slashs pour chemin absolu).
 
 ## Exécution avec Docker
 
-- Build de l'image
+1. Build de l'image :
+
 ```bash
 docker build -t medbridge-api .
 ```
 
-- Lancer le conteneur
+2. Lancer le conteneur (expose `8000`):
+
 ```bash
 docker run -it --rm -p 8000:8000 medbridge-api
 ```
 
-- Avec Docker Compose
+3. Recommandation pour persistance DB avec Docker : monter un volume pour stocker le fichier SQLite:
+
 ```bash
-docker compose up --build
-docker compose down
+docker run -it --rm -p 8000:8000 -v "${PWD}/data:/data" -e DATABASE_URL="sqlite:////data/medbridge.db" medbridge-api
 ```
 
-## Développement
+Avec `docker compose` (fichier `docker-compose.yml` fourni) :
 
-Le mode `--reload` est activé par défaut, ce qui signifie que le serveur se rechargera automatiquement à chaque modification du code.
+```bash
+docker compose up --build
+```
 
-## Arrêt du serveur
+> Remarque : SQLite convient pour le développement et les prototypes mono-instance. Pour la production, migrez vers PostgreSQL ou un service relationnel managé.
 
-Pour arrêter le serveur, appuyez sur `Ctrl+C` dans le terminal.
+## Tests et qualité
+
+- Pour ajouter des tests : utiliser `pytest` + `httpx` (client de test). Exemple : `pytest tests/`.
+- Linter / formatter recommandés : `ruff`, `black`, et `isort`.
+- Audit de dépendances : `pip-audit` / `pip-audit`.
+
+Exemples de commandes (PowerShell):
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt pytest httpx pip-audit ruff black
+ruff check .
+black .
+pip-audit
+pytest
+```
+
+## Notes de déploiement
+
+- Ne pas utiliser l'option `--reload` en production.
+- Pour la production, exécuter l'app derrière un processus maître (ex: `gunicorn -k uvicorn.workers.UvicornWorker`) et utiliser PostgreSQL.
+- Ajouter des migrations (Alembic) si vous migrez vers PostgreSQL.
+
+## Prochaines améliorations proposées
+
+- Ajouter tests unitaires et d'intégration CI (GitHub Actions)
+- Ajouter authentification/autorisation (OAuth2/JWT) si l'application manipule des données patients
+- Remplacer SQLite par PostgreSQL pour multi-instance et sauvegardes régulières
 
 ## Structure du projet
 
 ```
 MedBridge/
-├── main.py               # Point d'entrée de l'application
-├── requirements.txt      # Dépendances Python
+├── main.py               # Point d'entrée de l'application (FastAPI + SQLModel)
+├── requirements.txt      # Dépendances Python (versions pinées)
 ├── Dockerfile            # Image Docker pour exécuter l'app
 ├── docker-compose.yml    # Lancement simplifié avec Docker Compose
 ├── .dockerignore         # Fichiers ignorés par Docker
-├── .venv/                # (Optionnel) Environnement virtuel local
+├── data/                 # (optionnel) dossier monté en volume pour SQLite
 └── README.md             # Ce fichier
+```

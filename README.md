@@ -1,13 +1,24 @@
-# Application Médicale FastAPI
+# MedBridge — API To-Do médicale (FastAPI)
 
-Ce projet est une application médicale construite avec FastAPI.
+Petite API de gestion de tâches médicales construite avec FastAPI. Le projet utilise SQLite localement pour la persistance (via `sqlmodel`).
+
+**Principales fonctionnalités**
+- CRUD complet pour les tâches (`/todos/`)
+- Documentation interactive : `/docs` (Swagger) et `/redoc`
+
+## Démarrage rapide avec Docker Compose
+
+Pour lancer l'application avec Docker Compose (recommandé):
+
+```bash
+git clone https://github.com/NO-YA/MedBridge.git
+cd MedBridge
+docker compose up --build
+```
+
+L'API sera accessible sur `http://localhost:8000/docs` (Swagger UI).
 
 ## Prérequis
-
-- Python 3.12 ou supérieur
-- Un environnement virtuel Python (venv)
-
-## Installation
 
 1. Cloner le repository :
 ```bash
@@ -25,8 +36,8 @@ Petite API de gestion de tâches médicales construite avec FastAPI. Le projet u
 
 ## Prérequis
 
-- Python 3.11+ (3.12 recommandé)
-- Docker (optionnel pour exécution en conteneur)
+- Python 3.11+ (3.12 recommandé) — pour exécution locale
+- Docker + Docker Compose — pour exécution en conteneur (recommandé)
 
 ## Installation et exécution (local)
 
@@ -73,33 +84,25 @@ Accéder ensuite à:
 - `DATABASE_URL` : URL de la base de données SQLAlchemy. Par défaut: `sqlite:///./medbridge.db`.
 	- Exemple pour un volume Docker : `sqlite:////data/medbridge.db` (notez les 4 slashs pour chemin absolu).
 
-## Exécution avec Docker
+## Exécution avec Docker Compose (recommandé)
 
-1. Build de l'image :
-
-```bash
-docker build -t medbridge-api .
-```
-
-2. Lancer le conteneur (expose `8000`):
-
-```bash
-docker run -it --rm -p 8000:8000 medbridge-api
-```
-
-3. Recommandation pour persistance DB avec Docker : monter un volume pour stocker le fichier SQLite:
-
-```bash
-docker run -it --rm -p 8000:8000 -v "${PWD}/data:/data" -e DATABASE_URL="sqlite:////data/medbridge.db" medbridge-api
-```
-
-Avec `docker compose` (fichier `docker-compose.yml` fourni) :
+Lancer l'application complète avec persistance SQLite :
 
 ```bash
 docker compose up --build
 ```
 
-> Remarque : SQLite convient pour le développement et les prototypes mono-instance. Pour la production, migrez vers PostgreSQL ou un service relationnel managé.
+L'API sera disponible sur :
+- Swagger UI : `http://localhost:8000/docs`
+- ReDoc : `http://localhost:8000/redoc`
+- API root : `http://localhost:8000/`
+
+Pour arrêter :
+```bash
+docker compose down
+```
+
+> La base de données SQLite est stockée dans un volume Docker persistant (`medbridge-data`). Les données survivront aux redémarrages du conteneur.
 
 ## Tests et qualité
 

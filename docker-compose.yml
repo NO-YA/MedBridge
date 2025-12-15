@@ -6,7 +6,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=sqlite:////data/medbridge.db
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/medbridge
       - PYTHONUNBUFFERED=1
     volumes:
       - medbridge-data:/data
@@ -17,7 +17,25 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:15
+    container_name: medbridge-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=medbridge
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   medbridge-data:
+    driver: local
+  db-data:
     driver: local

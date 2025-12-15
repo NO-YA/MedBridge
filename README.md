@@ -127,6 +127,49 @@ pytest
 - Pour la production, exécuter l'app derrière un processus maître (ex: `gunicorn -k uvicorn.workers.UvicornWorker`) et utiliser PostgreSQL.
 - Ajouter des migrations (Alembic) si vous migrez vers PostgreSQL.
 
+## Utiliser PostgreSQL (local avec Docker Compose)
+
+Le projet inclut désormais un service `postgres` dans `docker-compose.yml`. Pour démarrer l'ensemble (Postgres + app) :
+
+```bash
+docker compose up --build
+```
+
+Appliquer les migrations (depuis l'hôte ou via `docker compose run` dans le conteneur) :
+
+```bash
+# Générer une migration (optionnel si vous avez modifié les modèles)
+docker compose run --rm app alembic revision --autogenerate -m "add changes"
+
+# Appliquer les migrations
+docker compose run --rm app alembic upgrade head
+```
+
+Remarques:
+- `DATABASE_URL` dans `docker-compose.yml` est configurée pour utiliser la base Postgres : `postgresql://postgres:postgres@postgres:5432/medbridge`.
+- Vous pouvez aussi utiliser la variable d'environnement `DATABASE_URL` localement (ex: `export DATABASE_URL=postgresql://...`).
+
+Démarrer et tester l'application avec `docker compose run`:
+
+- Si vous voulez simplement exécuter l'app à la demande et exposer le port 8000 sur l'hôte, utilisez `--service-ports` :
+
+```bash
+# Démarrer Postgres en arrière-plan (si nécessaire)
+docker compose up -d postgres
+
+# Démarrer un conteneur éphémère pour l'app et exposer le port
+docker compose run --service-ports --rm app
+```
+
+- Pour appliquer les migrations depuis le conteneur (nécessite que Postgres soit démarré) :
+
+```bash
+docker compose run --rm app alembic upgrade head
+```
+
+Remarque: l'image contient un petit `entrypoint.sh` qui attend que la base de données soit joignable avant de lancer `uvicorn`, ce qui facilite l'utilisation avec `docker compose run`.
+
+
 ## Prochaines améliorations proposées
 
 - Ajouter tests unitaires et d'intégration CI (GitHub Actions)

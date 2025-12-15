@@ -4,12 +4,20 @@ import os
 
 from fastapi import FastAPI, HTTPException, Response, status
 from sqlmodel import Field, SQLModel, Session, create_engine, select
+from sqlalchemy import func
+
+from app.settings import settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./medbridge.db")
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+DATABASE_URL = os.getenv("DATABASE_URL", settings.DATABASE_URL)
+
+# Create engine differently for SQLite (needs check_same_thread)
+if DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+else:
+    engine = create_engine(DATABASE_URL)
 
 
 class Todo(SQLModel, table=True):
@@ -42,7 +50,8 @@ def on_startup():
     logger.info("Database tables created/verified")
     # seed initial data if table is empty
     with Session(engine) as session:
-        count = session.exec(select(Todo)).count()
+        # Use SQL COUNT aggregation instead of loading all rows
+        count = session.exec(select(func.count()).select_from(Todo)).scalar_one()
         if count == 0:
             logger.info("Seeding initial todos into database")
             sample = [

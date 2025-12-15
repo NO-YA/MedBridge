@@ -72,6 +72,38 @@ L'application sera accessible aux adresses suivantes :
 - Documentation Swagger : http://127.0.0.1:8000/docs
 - Documentation ReDoc : http://127.0.0.1:8000/redoc
 
+## Utiliser PostgreSQL (développement)
+
+Par défaut l'application peut fonctionner en mémoire, mais pour la persistance vous pouvez configurer PostgreSQL :
+
+1. Créez une base PostgreSQL (ex: `medbridge`) et un utilisateur avec mot de passe.
+2. Copiez `.env.example` en `.env` et modifiez `DATABASE_URL` (format async pour SQLAlchemy + asyncpg) :
+
+```env
+DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/medbridge
+```
+
+Si vous utilisez `docker compose` fourni (service `db`), vous pouvez utiliser :
+
+```env
+DATABASE_URL=postgresql+asyncpg://medbridge:medbridge123@db:5432/medbridge_db
+```
+
+3. Installez les dépendances et créez les tables :
+
+```bash
+pip install -r requirements.txt
+python create_tables.py
+```
+
+4. Lancez le serveur :
+
+```bash
+uvicorn main:app --reload
+```
+
+Note: Pour des migrations structurées, vous pouvez initialiser Alembic (`alembic init alembic`) et créer une première révision; j'ai ajouté `alembic` aux dépendances pour faciliter la suite.
+
 ## Exécution avec Docker
 
 - Build de l'image
